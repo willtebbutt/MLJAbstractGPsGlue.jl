@@ -1,0 +1,10 @@
+[deps]
+AbstractGPs = "99985d1d-32ba-4be9-9821-2ec096f28918"
+MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
+MLJAbstractGPsGlue = "8b53f75a-7fc5-4a6e-98d3-d4400dab8eec"
+MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
+ParameterHandling = "2412ca09-6db7-441c-8e3a-88d5709968c5"
+
+[compat]
+MLJ = "0.16"
+MLJBase = "0.18"
