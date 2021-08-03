@@ -6,7 +6,13 @@ using Optim
 using ParameterHandling
 using Zygote
 
-import MLJModelInterface: fit, fitted_params, predict, matrix, JointProbabilistic
+import MLJModelInterface:
+    fit,
+    fitted_params,
+    predict, 
+    predict_mean,
+    matrix,
+    JointProbabilistic
 
 mutable struct MLJAbstractGP{T, V} <: JointProbabilistic
     initial_parameters::T
@@ -47,6 +53,7 @@ __default_build_gp(θ) = GP(θ.σ² * SEKernel() ∘ ScaleTransform(θ.λ))
 # This method currently just assumes that `X` is matrix-like. Probably this can be refined
 # to ensure that the correct type gets used in the correct situation.
 function fit(model::MLJAbstractGP, verbosity, X, y::AbstractVector{<:Real})
+    @show verbosity
 
     # Convert inputs into a type that `AbstractGPs` understands.
     x = ColVecs(collect(matrix(X; transpose=true)))
@@ -77,7 +84,7 @@ function fit(model::MLJAbstractGP, verbosity, X, y::AbstractVector{<:Real})
             alphaguess = Optim.LineSearches.InitialStatic(scaled=true),
             linesearch = Optim.LineSearches.BackTracking(),
         ),
-        Optim.Options(show_trace = verbosity >= 0);
+        Optim.Options(show_trace = verbosity > 0);
         inplace=false,
     )
 
