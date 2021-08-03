@@ -53,7 +53,6 @@ __default_build_gp(θ) = GP(θ.σ² * SEKernel() ∘ ScaleTransform(θ.λ))
 # This method currently just assumes that `X` is matrix-like. Probably this can be refined
 # to ensure that the correct type gets used in the correct situation.
 function fit(model::MLJAbstractGP, verbosity, X, y::AbstractVector{<:Real})
-    @show verbosity
 
     # Convert inputs into a type that `AbstractGPs` understands.
     x = ColVecs(collect(matrix(X; transpose=true)))
