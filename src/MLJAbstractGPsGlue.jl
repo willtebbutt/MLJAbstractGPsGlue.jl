@@ -57,8 +57,7 @@ __default_build_gp(θ) = GP(θ.σ² * SEKernel() ∘ ScaleTransform(θ.λ))
 # GP the user provides, so not possible to know this in general.
 input_scitype(::Type{<:MLJAbstractGP}) = Unknown
 
-# This method currently just assumes that `X` is matrix-like. Probably this can be refined
-# to ensure that the correct type gets used in the correct situation.
+# No explicit constraint placed up X, just requires that the `matrix` function works on it.
 function fit(model::MLJAbstractGP, verbosity, X, y::AbstractVector{<:Real})
 
     # Convert inputs into a type that `AbstractGPs` understands.
