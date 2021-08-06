@@ -57,8 +57,6 @@ __default_build_gp(θ) = GP(θ.σ² * SEKernel() ∘ ScaleTransform(θ.λ))
 # GP the user provides, so not possible to know this in general.
 input_scitype(::Type{<:MLJAbstractGP}) = Unknown
 
-target_scitype(::Type{<:MLJAbstractGP}) = Continuous
-
 # This method currently just assumes that `X` is matrix-like. Probably this can be refined
 # to ensure that the correct type gets used in the correct situation.
 function fit(model::MLJAbstractGP, verbosity, X, y::AbstractVector{<:Real})
@@ -131,11 +129,13 @@ function predict_mean(model::MLJAbstractGP, fit_result, X_new)
     return map(mean, predict(model, fit_result, X_new))
 end
 
+logpdf_loss(marginals, y) = -sum((d, y) -> logpdf(d, y), zip(marginals, y))
+
 MLJModelInterface.metadata_pkg(
     MLJAbstractGP;
     name="AbstractGPs.jl",
-    uuid="8b53f75a-7fc5-4a6e-98d3-d4400dab8eec",
-    url="https://github.com/willtebbutt/MLJAbstractGPsGlue.jl/",
+    uuid="99985d1d-32ba-4be9-9821-2ec096f28918",
+    url="https://github.com/willtebbutt/AbstractGPs.jl/",
     julia=true,
     license="MIT",
     is_wrapper=true,
@@ -149,7 +149,6 @@ MLJModelInterface.metadata_model(
     load_path="MLJAbstractGPsGlue.MLJAbstractGP",
 )
 
-logpdf_loss(marginals, y) = -sum((d, y) -> logpdf(d, y), zip(marginals, y))
 
 export MLJAbstractGP, logpdf_loss
 
