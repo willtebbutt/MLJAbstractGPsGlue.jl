@@ -13,7 +13,9 @@ import MLJModelInterface:
     predict_joint,
     predict_mean,
     matrix,
-    JointProbabilistic
+    JointProbabilistic,
+    target_scitype,
+    input_scitype
 
 mutable struct MLJAbstractGP{T, V} <: JointProbabilistic
     initial_parameters::T
@@ -50,6 +52,12 @@ const __default_gp_parameters = (
 )
 
 __default_build_gp(θ) = GP(θ.σ² * SEKernel() ∘ ScaleTransform(θ.λ))
+
+# The scitype for these models could pretty much be anything, depending upon the kind of
+# GP the user provides, so not possible to know this in general.
+input_scitype(::Type{<:MLJAbstractGP}) = Unknown
+
+target_scitype(::Type{<:MLJAbstractGP}) = Continuous
 
 # This method currently just assumes that `X` is matrix-like. Probably this can be refined
 # to ensure that the correct type gets used in the correct situation.
