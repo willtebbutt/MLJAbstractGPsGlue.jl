@@ -120,7 +120,7 @@ end
 
 MLJModelInterface.metadata_pkg(
     MLJAbstractGP;
-    name="MLJAbstractGPsGlue.jl",
+    name="AbstractGPs.jl",
     uuid="8b53f75a-7fc5-4a6e-98d3-d4400dab8eec",
     url="https://github.com/willtebbutt/MLJAbstractGPsGlue.jl/",
     julia=true,
