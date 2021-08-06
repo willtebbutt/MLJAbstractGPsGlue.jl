@@ -9,7 +9,8 @@ using Zygote
 import MLJModelInterface:
     fit,
     fitted_params,
-    predict, 
+    predict,
+    predict_joint,
     predict_mean,
     matrix,
     JointProbabilistic
@@ -105,7 +106,7 @@ end
 
 fitted_params(::MLJAbstractGP, fit_result) = fit_result.final_params
 
-function predict(model::MLJAbstractGP, fit_result, X_new)
+function predict_joint(model::MLJAbstractGP, fit_result, X_new)
 
     # Convert inputs into a type that `AbstractGPs` understands.
     x_new = ColVecs(collect(matrix(X_new; transpose=true)))
@@ -114,8 +115,12 @@ function predict(model::MLJAbstractGP, fit_result, X_new)
     return fit_result.posterior(x_new, fit_result.noise_variance + 1e-3)
 end
 
+function predict(model::MLJAbstractGP, fit_result, X_new)
+    return marginals(predict_joint(model, fit_result, X_new))
+end
+
 function predict_mean(model::MLJAbstractGP, fit_result, X_new)
-    return mean(predict(model, fit_result, X_new))
+    return map(mean, predict(model, fit_result, X_new))
 end
 
 MLJModelInterface.metadata_pkg(
@@ -136,7 +141,7 @@ MLJModelInterface.metadata_model(
     load_path="MLJAbstractGPsGlue.MLJAbstractGP",
 )
 
-logpdf_loss(fx, y) = -logpdf(fx, y)
+logpdf_loss(marginals, y) = -sum((d, y) -> logpdf(d, y), zip(marginals, y))
 
 export MLJAbstractGP, logpdf_loss
 
