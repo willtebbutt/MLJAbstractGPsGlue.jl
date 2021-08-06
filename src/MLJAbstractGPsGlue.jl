@@ -128,7 +128,7 @@ function predict_mean(model::MLJAbstractGP, fit_result, X_new)
     return map(mean, predict(model, fit_result, X_new))
 end
 
-logpdf_loss(marginals, y) = -sum((d, y) -> logpdf(d, y), zip(marginals, y))
+logpdf_loss(marginals, y) = -sum(x -> logpdf(x[1], x[2]), zip(marginals, y))
 
 MLJModelInterface.metadata_pkg(
     MLJAbstractGP;
