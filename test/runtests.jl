@@ -1,7 +1,6 @@
 using AbstractGPs
 using MLJAbstractGPsGlue
 using MLJBase
-using MLJ
 using ParameterHandling
 using Test
 
@@ -23,8 +22,12 @@ using Test
     @test predict(regressor; rows=test_rows) isa Vector{<:AbstractGPs.Normal}
     @test predict_mean(regressor; rows=test_rows) isa Vector{<:Real}
 
-    @test ==(
-        length(predict(regressor; rows=test_rows)),
-        length(predict_mean(regressor; rows=test_rows)),
+    @test isapprox(
+        mean(only(predict(regressor; rows=test_rows[2:2]))),
+        mean(predict(regressor; rows=test_rows)[2]),
+    )
+    @test isapprox(
+        std(only(predict(regressor; rows=test_rows[2:2]))),
+        std(predict(regressor; rows=test_rows)[2]),
     )
 end
