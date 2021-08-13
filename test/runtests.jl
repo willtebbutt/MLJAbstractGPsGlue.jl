@@ -22,12 +22,14 @@ using Test
     @test predict(regressor; rows=test_rows) isa Vector{<:AbstractGPs.Normal}
     @test predict_mean(regressor; rows=test_rows) isa Vector{<:Real}
 
-    @test isapprox(
-        mean(only(predict(regressor; rows=test_rows[2:2]))),
-        mean(predict(regressor; rows=test_rows)[2]),
-    )
-    @test isapprox(
-        std(only(predict(regressor; rows=test_rows[2:2]))),
-        std(predict(regressor; rows=test_rows)[2]),
-    )
+    @testset for j in 1:10
+        @test isapprox(
+            mean(predict(regressor; rows=test_rows[1:10])[j]),
+            mean(predict(regressor; rows=test_rows)[j]),
+        )
+        @test isapprox(
+            std(predict(regressor; rows=test_rows[1:10])[j]),
+            std(predict(regressor; rows=test_rows)[j]),
+        )
+    end
 end
