@@ -1,7 +1,7 @@
 name = "MLJAbstractGPsGlue"
 uuid = "8b53f75a-7fc5-4a6e-98d3-d4400dab8eec"
 authors = ["WT <wt0881@my.bristol.ac.uk> and contributors"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 AbstractGPs = "99985d1d-32ba-4be9-9821-2ec096f28918"

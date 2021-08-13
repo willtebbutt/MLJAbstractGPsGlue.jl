@@ -1,7 +1,6 @@
 using AbstractGPs
 using MLJAbstractGPsGlue
 using MLJBase
-using MLJ
 using ParameterHandling
 using Test
 
@@ -19,8 +18,18 @@ using Test
     train_rows, test_rows = partition(eachindex(y), 0.7, shuffle=true)
     fit!(regressor; rows=train_rows, verbosity=0)
 
-    @test ==(
-        mean(predict(regressor; rows=test_rows)),
-        predict_mean(regressor; rows=test_rows),
-    )
+    @test predict_joint(regressor; rows=test_rows) isa AbstractGPs.AbstractMvNormal
+    @test predict(regressor; rows=test_rows) isa Vector{<:AbstractGPs.Normal}
+    @test predict_mean(regressor; rows=test_rows) isa Vector{<:Real}
+
+    @testset for j in 1:10
+        @test isapprox(
+            mean(predict(regressor; rows=test_rows[1:10])[j]),
+            mean(predict(regressor; rows=test_rows)[j]),
+        )
+        @test isapprox(
+            std(predict(regressor; rows=test_rows[1:10])[j]),
+            std(predict(regressor; rows=test_rows)[j]),
+        )
+    end
 end

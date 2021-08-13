@@ -9,10 +9,13 @@ using Zygote
 import MLJModelInterface:
     fit,
     fitted_params,
-    predict, 
+    predict,
+    predict_joint,
     predict_mean,
     matrix,
-    JointProbabilistic
+    JointProbabilistic,
+    target_scitype,
+    input_scitype
 
 mutable struct MLJAbstractGP{T, V} <: JointProbabilistic
     initial_parameters::T
@@ -50,8 +53,11 @@ const __default_gp_parameters = (
 
 __default_build_gp(θ) = GP(θ.σ² * SEKernel() ∘ ScaleTransform(θ.λ))
 
-# This method currently just assumes that `X` is matrix-like. Probably this can be refined
-# to ensure that the correct type gets used in the correct situation.
+# The scitype for these models could pretty much be anything, depending upon the kind of
+# GP the user provides, so not possible to know this in general.
+input_scitype(::Type{<:MLJAbstractGP}) = Unknown
+
+# No explicit constraint placed up X, just requires that the `matrix` function works on it.
 function fit(model::MLJAbstractGP, verbosity, X, y::AbstractVector{<:Real})
 
     # Convert inputs into a type that `AbstractGPs` understands.
@@ -105,7 +111,7 @@ end
 
 fitted_params(::MLJAbstractGP, fit_result) = fit_result.final_params
 
-function predict(model::MLJAbstractGP, fit_result, X_new)
+function predict_joint(model::MLJAbstractGP, fit_result, X_new)
 
     # Convert inputs into a type that `AbstractGPs` understands.
     x_new = ColVecs(collect(matrix(X_new; transpose=true)))
@@ -114,15 +120,17 @@ function predict(model::MLJAbstractGP, fit_result, X_new)
     return fit_result.posterior(x_new, fit_result.noise_variance + 1e-3)
 end
 
-function predict_mean(model::MLJAbstractGP, fit_result, X_new)
-    return mean(predict(model, fit_result, X_new))
+function predict(model::MLJAbstractGP, fit_result, X_new)
+    return marginals(predict_joint(model, fit_result, X_new))
 end
+
+logpdf_loss(marginals, y) = -sum(x -> logpdf(x[1], x[2]), zip(marginals, y))
 
 MLJModelInterface.metadata_pkg(
     MLJAbstractGP;
-    name="MLJAbstractGPsGlue.jl",
-    uuid="8b53f75a-7fc5-4a6e-98d3-d4400dab8eec",
-    url="https://github.com/willtebbutt/MLJAbstractGPsGlue.jl/",
+    name="AbstractGPs.jl",
+    uuid="99985d1d-32ba-4be9-9821-2ec096f28918",
+    url="https://github.com/willtebbutt/AbstractGPs.jl/",
     julia=true,
     license="MIT",
     is_wrapper=true,
@@ -136,7 +144,6 @@ MLJModelInterface.metadata_model(
     load_path="MLJAbstractGPsGlue.MLJAbstractGP",
 )
 
-logpdf_loss(fx, y) = -logpdf(fx, y)
 
 export MLJAbstractGP, logpdf_loss
 
